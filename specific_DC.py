@@ -1,7 +1,9 @@
 import json
 from pathlib import Path
 
-dc_ev_json = ["Altervim", "EA", "EleX", "etc", "MG", "PEA", "PTT"]
+# dc_ev_json = ["Altervim", "EA", "EleX", "etc", "MG", "PEA", "PTT"]
+dc_ev_json = ["Altervim"]
+
 
 # Add up json from folder DC_EV_Charging_Station_Thailand
 for ev_json in dc_ev_json:
@@ -11,10 +13,12 @@ for ev_json in dc_ev_json:
         output = {"providers": f'{ev_json}', "results": []}
         output_file_path = Path(f'EV_Charging_Stations/{ev_json}_output.json')
         for chunk in data['features']:
+            
             output["results"].append(chunk['properties'])
+        print(output)
     # Write the output to a new file
-    with open(output_file_path, 'w', encoding="utf-8") as output_file:
-        json.dump(output, output_file, indent=4, ensure_ascii=False)
-        print("Output file created:", output_file_path)
+    # with open(output_file_path, 'w', encoding="utf-8") as output_file:
+    #     json.dump(output, output_file, indent=4, ensure_ascii=False)
+    #     print("Output file created:", output_file_path)
 
         
