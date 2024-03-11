@@ -1,6 +1,8 @@
 from pathlib import Path
 import json
-import re
+import random
+import string
+import time
 output = {"results": []}
 output_file_path = Path('EV_Charging_Stations/output.json')
 dc_ev_json = ["Altervim", "EA", "EleX", "etc", "MG", "PEA", "PTT"]
@@ -21,7 +23,7 @@ dc_ev_json = ["Altervim", "EA", "EleX", "etc", "MG", "PEA", "PTT"]
 # "2x CCS2 60 kW"
 # "CCS2 90 kW, 2x CCS2 120 kW (200A)"
 
-from typing import List, Dict
+
 
 CHARGER_TYPES = {"CCS2", "Type1", "Type2", "CHAdeMO"}
 
@@ -74,6 +76,11 @@ def extract_charger_type(description: str) -> (int, list):
   # Return total count and list of charger dictionaries (or None if empty)
   return total_count, filtered_chargers if filtered_chargers else None
 
+
+def generate_custom_id():
+    timestamp = str(int(time.time()))
+    random_chars = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    return f"ID-{timestamp}-{random_chars}"
 
 test_cases = [
     "2x Type2: 11 kW",
@@ -135,17 +142,19 @@ for ev_json in dc_ev_json:
                 # print(description)
                 if description != None:
                    evConnectorCount, evConnectorAggregation = extract_charger_type(description)
-                   print(f"count: {evConnectorCount}, aggregation:{evConnectorAggregation}")
+                #    print(f"count: {evConnectorCount}, aggregation:{evConnectorAggregation}")
                    chunk['properties']['evConnectorCount'] = evConnectorCount
                    chunk['properties']['evConnectorAggregation'] = evConnectorAggregation
                 else:
                     chunk['properties']['evConnectorCount'] = None
                     chunk['properties']['evConnectorAggregation'] = None
+                custom_id = generate_custom_id()
+                chunk["properties"]["stationID"] = custom_id
                 output["results"].append(chunk['properties'])
             
 
         
 # Write the output to a new file
-with open(output_file_path, 'w', encoding="utf-8") as output_file:
-    json.dump(output, output_file, indent=4, ensure_ascii=False)
-print("Output file created:", output_file_path)
+# with open(output_file_path, 'w', encoding="utf-8") as output_file:
+#     json.dump(output, output_file, indent=4, ensure_ascii=False)
+# print("Output file created:", output_file_path)
